@@ -482,11 +482,11 @@ static size_t max_string_size(SANE_String_Const s[])
 }
 
 static SANE_String_Const doc_sources[] = {
-    "Flatbed", "ADF", "Auto", NULL
+    "Flatbed", "ADF", "ADF Duplex", "Auto", NULL
 };
 
 static int doc_source_to_code[] = {
-    0x40, 0x20, 0x80
+    0x40, 0x20, 0x10, 0x80
 };
 
 static SANE_String_Const scan_modes[] = {

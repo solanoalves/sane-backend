@@ -218,6 +218,7 @@ SANE_Status ret_cancel(struct device *dev, SANE_Status ret);
 #define MODE_RGB24		0x05
 
 /* Document Source */
+#define DOC_ADF_DUPLEX		0x10
 #define DOC_ADF			0x20
 #define DOC_FLATBED		0x40
 #define DOC_AUTO		0x80
