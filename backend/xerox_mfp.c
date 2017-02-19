@@ -772,6 +772,7 @@ static int dev_set_window(struct device *dev)
             cmd[0x14] = 0x6;
         }
     }
+    cmd[0x15] = 0x01; //fixed image raster quality
     cmd[0x16] = dev->threshold;
     cmd[0x17] = dev->doc_source;
 
