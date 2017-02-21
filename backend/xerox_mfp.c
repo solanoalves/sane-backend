@@ -205,7 +205,6 @@ static int dump_to_tmp_file(struct device *dev)
 static int isSupportedDevice(struct device __sane_unused__ *dev)
 {
 #ifdef HAVE_LIBJPEG
-    /* Checking device which supports JPEG Lossy compression for color scanning*/
     if (dev->compressionTypes & (1 << 6))
         return 1;
     else
@@ -772,7 +771,7 @@ static int dev_set_window(struct device *dev)
             cmd[0x14] = 0x6;
         }
     }
-    cmd[0x15] = 0x01; //fixed image raster quality
+	cmd[0x15] = 0x1;
     cmd[0x16] = dev->threshold;
     cmd[0x17] = dev->doc_source;
 
@@ -1317,7 +1316,8 @@ sane_read(SANE_Handle h, SANE_Byte *buf, SANE_Int maxlen, SANE_Int *lenp)
                 remove(encTmpFileName);
             }
             /* that's all */
-            dev_stop(dev);
+			if(!(dev->doc_source == DOC_ADF_DUPLEX))
+	            dev_stop(dev);
             return SANE_STATUS_EOF;
         }
 
@@ -1433,15 +1433,19 @@ sane_start(SANE_Handle h)
         dev->reserved++;
     }
 
-    if (!dev_set_window(dev) ||
-        (dev->state && dev->state != SANE_STATUS_DEVICE_BUSY))
+	int positioned = 1;
+	if(dev->doc_source == DOC_ADF_DUPLEX){
+		positioned = dev_cmd_wait(dev, CMD_OBJECT_POSITION);
+	}
+
+    if (!dev_set_window(dev)) 
         return dev_stop(dev);
 
-    if (!dev_cmd_wait(dev, CMD_OBJECT_POSITION))
-        return dev_stop(dev);
-
-    if (!dev_cmd(dev, CMD_READ) ||
-        (dev->state && dev->state != SANE_STATUS_DEVICE_BUSY))
+    if(!positioned){
+		if (!dev_cmd_wait(dev, CMD_OBJECT_POSITION))
+        	return dev_stop(dev);
+	}
+    if (!dev_cmd(dev, CMD_READ))
         return dev_stop(dev);
 
     dev->scanning = 1;
